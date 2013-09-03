@@ -9,14 +9,14 @@ module Fluent
     end
 
     def format(tag, time, record)
-      tag_elems = tag.split('.')
-      tag_elems.shift  # remove PREFIX
-      dir = File.join(@path, *tag_elems)
+      #tag_elems = tag.split('.')
+      #tag_elems.shift  # remove PREFIX
+      #dir = File.join(@path, *tag_elems)
 
       # @timef is assigned in FileOutput.configure
       time_str = @timef.format(time)
 
-      [dir, "#{time_str}\t#{Yajl.dump(record)}\n"].to_msgpack
+      [tag, "#{time_str}\t#{Yajl.dump(record)}\n"].to_msgpack
     end
 
     def write(chunk)
@@ -28,8 +28,8 @@ module Fluent
       end
 
       hash = {}
-      chunk.msgpack_each do |(dir, data)|
-        sym = dir.to_sym
+      chunk.msgpack_each do |(tag, data)|
+        sym = tag.to_sym
         if hash.include?(sym)
           hash[sym] += data
         else
@@ -37,15 +37,18 @@ module Fluent
         end
       end
 
-      hash.each do |dir, data|
-        dir = File.join(dir.to_s, chunk.key)
-
-        i = 0
-        begin
-          path = File.join(dir, "#{i}.log#{suffix}")
-          i += 1
-        end while File.exist?(path)
+      hash.each do |tag, data|
+        #dir = File.join(dir.to_s, chunk.key)
+        tag_elems = tag.split('.')
+        #tag_elems.shift  # remove PREFIX
+        dir = File.join(@path, *tag_elems)
+        #  i = 0
+        #  begin
+        #    path = File.join(dir, "#{i}.log#{suffix}")
+        #    i += 1
+        #  end while File.exist?(path)
         FileUtils.mkdir_p dir
+        path = File.join(dir, "#{chunk.key}.log#{suffix}")
 
         case @compress
         when nil
