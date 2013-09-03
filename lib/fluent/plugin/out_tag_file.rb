@@ -3,7 +3,7 @@ module Fluent
     Plugin.register_output('tag_file', self)
 
     def configure(conf)
-      conf['buffer_path'] ||= File.join(conf['path'], 'buffer')
+      #conf['buffer_path'] ||= File.join(conf['path'], 'buffer')
 
       super
     end
