@@ -39,7 +39,7 @@ module Fluent
 
       hash.each do |tag, data|
         #dir = File.join(dir.to_s, chunk.key)
-        tag_elems = tag.split('.')
+        tag_elems = tag.to_s.split('.')
         #tag_elems.shift  # remove PREFIX
         dir = File.join(@path, *tag_elems)
         #  i = 0
